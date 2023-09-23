@@ -1,0 +1,213 @@
+
+<!--
+<div class="map-container">
+    <div class="map-frame">
+      <div #mymap id="map"></div>
+    </div>
+  </div>
+-->
+
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block  sidebar collapse shadow-lg p-3   " style="margin-top: 60px; background-color: rgba(15, 16, 16, 0.7);">
+  <div class="sidebar-sticky pt-3">
+  
+    <button type="button" class="btn btn-info " style="width: 100%;" (click)="openModal()">Affecter une terre</button>
+    <div class="btn-group mt-5" dropdown>
+      <button id="button-animated" dropdownToggle type="button" class="btn btn-info dropdown-toggle"
+              aria-controls="dropdown-animated">
+        Requêtes Topographiques<span class="caret"></span>
+      </button>
+
+      <ul id="dropdown-animated" *dropdownMenu class="dropdown-menu overflow-auto"
+          role="menu" aria-labelledby="button-animated">
+          <li role="menuitem" (click) = "openModalTerreNyanga()"><a class="dropdown-item" href="#">Terre occupées dans NYANGA</a>
+          <li class="divider dropdown-divider" ></li>
+          <li role="menuitem" (click) = "openModalProvinceInoccuper()"><a class="dropdown-item" href="#">Provinces sans terre occupées</a>
+         </li>
+         <li class="divider dropdown-divider" ></li>
+         <li role="menuitem" (click) = "openModalTauxOccupationReserves()"><a class="dropdown-item" href="#">Taux occupation des Reserves</a>
+         </li>
+      </ul>
+    </div>
+  </div>
+
+  
+</nav>
+  <div class="map-wrapper">
+    <div class="map-border">
+        <div id="map">
+
+        </div>
+    </div>
+  </div>
+
+  <!-- Debut modal template Terre de la province de NYANGA des reserves-->
+  <ng-template #templateTerreNyanga>
+    <div class="modal-header our-color titreApp">
+      <h4 class="modal-title pull-left ">Terre occupées dans NYANGA</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeModalTerreNyanga()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      
+        <table class="table">
+           <thead>
+             <tr>
+             <th>
+               CODE
+             </th>
+             <th>NOM</th>
+             <th>
+               Superficie
+             </th>
+            </tr>
+           </thead>
+           <tbody>
+            <tr *ngFor="let TerreNyanga of listTerreNyanga">
+             
+              <td>{{TerreNyanga.code}}</td>
+              <td>{{TerreNyanga.nom}}</td>
+              <td>{{TerreNyanga.superficie}}</td>
+             </tr>
+           </tbody>
+        </table>
+      
+    </div>
+  </ng-template>
+
+  <!-- Fin modal template Terre de la province de NYANGA des reserves-->
+
+  <!-- Debut modal template Province inoccuper des reserves-->
+  <ng-template #templateProvinceInoccuper>
+    <div class="modal-header our-color titreApp">
+      <h4 class="modal-title pull-left ">Provinces sans terres occupées</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeModalProvinceInoccuper()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      
+        <table class="table">
+           <thead>
+             <tr>
+             <th>
+               CODE
+             </th>
+             <th>NOM</th>
+             <th>
+               Superficie
+             </th>
+            </tr>
+           </thead>
+           <tbody>
+            <tr *ngFor="let TerreNyanga of listProvinceInoccuper">
+             
+              <td>{{TerreNyanga.code}}</td>
+              <td>{{TerreNyanga.nom}}</td>
+              <td>{{TerreNyanga.superficie}}</td>
+             </tr>
+           </tbody>
+        </table>
+      
+    </div>
+  </ng-template>
+  
+  <!-- Fin modal template Province inoccuper des reserves-->
+
+  <!-- Debut modal templateTauxOccupation des reserves-->
+  <ng-template #templateTauxOccupationReserves>
+    <div class="modal-header our-color titreApp">
+      <h4 class="modal-title pull-left ">Taux d'occupation des Reserves(Gabon)</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeModalTauxOccupationReserves()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="color: purple; font-weight: bolder; text-align: center; font-size: 30px;">
+        {{tauxOccupationReserve}} <span>%</span>
+      </p>
+    </div>
+  </ng-template>
+
+  <!-- Fin modal templateTauxOccupation des reserves-->
+
+ <!-- Debut Modal Formulaire--> 
+  <ng-template #template>
+    <div class="modal-header our-color titreApp">
+      <h4 class="modal-title pull-left ">Affecter une terre</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form #form="ngForm" (ngSubmit) = "onSubmit(form)">
+        <div class="form-group">
+          <label for="name">Nom propriétaire</label>
+          <input type="text" id="name" name="name"
+           required
+           #nameField = "ngModel"
+           (blur) = "onBlur(nameField)"
+           [(ngModel)] = "reserveSettings.name" 
+           [class.field-error] = "form.submitted && nameField.invalid" class="form-control">
+
+          <div [hidden] = "!form.submitted || nameField.valid " class="alert alert-danger">
+              Please insert a name value
+          </div>
+      </div>
+      <div class="form-group">
+        <label for="subscriptionType">Type de coordonnées</label>
+        <select class="form-control" id="coordonneeType" name="coordonneeType" [(ngModel)]= "coordonneeType">
+            
+            <option value="Point" selected>Point</option>
+            <option value="Polygone">Polygone</option>
+            <option value="Rectangle">Rectangle</option>
+            <option value="Ligne">Ligne</option>
+        </select>
+    </div>
+      <div class="form-group">
+        <label for="name">Longitude</label>
+        <input type="number" id="longitude" name="longitude"
+         required
+         #nameField = "ngModel"
+         (blur) = "onBlur(nameField)"
+         [(ngModel)] = "reserveSettings.longitude" 
+         [class.field-error] = "form.submitted && nameField.invalid" class="form-control">
+
+        <div [hidden] = "!form.submitted || nameField.valid " class="alert alert-danger">
+          Veillez saisie une longitude
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="name">Latitude</label>
+        <input type="number" id="latitude" name="latitude"
+         required
+         #nameField = "ngModel"
+         (blur) = "onBlur(nameField)"
+         [(ngModel)] = "reserveSettings.latitude" 
+         [class.field-error] = "form.submitted && nameField.invalid" class="form-control">
+
+        <div [hidden] = "!form.submitted || nameField.valid " class="alert alert-danger">
+          Veillez saisie une latitude
+        </div>
+      </div>
+      <div>
+        <button *ngIf="coordonneeType" type="button" class="btn btn-primary btn-sm" data-dismiss="modal" (click) = "onAddCoordinates()"><i class='fas fa-plus'></i> Ajouter des coordonnées</button>
+      </div>
+     
+      <div>
+
+      </div>
+      <div *ngIf = "addCoordinate" class="form-group">
+        <label for="listOfCoordinates">Liste de coordonnées</label>
+        <textarea name="listOfCoordinates" id="listOfCoordinates" [(ngModel)]= "listOfCoordinates" class="form-control"  rows="4">Liste des coordonées</textarea>
+     </div>
+      </form>
+    </div>
+    <div class="modal-footer py-2">
+      <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal" (click)="onSubmit(form)" ><i class='fas fa-check fa-spin'></i> Verifier</button>
+      <button type="button" class="btn btn-success btn-sm" aria-label="Close"  (click) = "closeModal()"><i class='fas fa-sync fa-spin'></i> Annuler</button>
+      <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" ><i class='fas fa-edit'></i> Affecter</button>
+    </div>
+  </ng-template>
+
+  <!-- Fin modal formulaire-->
